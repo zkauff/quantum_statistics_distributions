@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib
 from matplotlib import pyplot as plt
 
+k = 7.617 * pow(10, -5)  # eV / degree Kelvin
+
 
 def fermi_dist(e, t):
     return 1 / (np.exp(e / (k * t)) + 1)
@@ -12,12 +14,12 @@ def bose_dist(e, t):
     return 1 / (np.exp(e / (k * t)) - 1)
 
 
-matplotlib.use('TkAgg')
+def plot_by_temp():
+    print("Plotting population dependence on temperature.")
+    matplotlib.use('TkAgg')
 
-k = 8.617 * pow(10, -5)  # eV / degree Kelvin
-particle = '   uninitialized'
+    particle = '   uninitialized'
 
-while 1 > 0:
     print("please enter the type of particle: ")
     # Prompt user input for type of distribution
     for line in sys.stdin:
@@ -27,8 +29,8 @@ while 1 > 0:
         if 'Boson'.lower() == line.rstrip().lower():
             particle = 'Boson'
             break
-        print(f'Unknown particle type: {line} Supported particles are [Fermion][Boson]')
-    print(f'Selected particle is \'{particle}\'')
+        print("Unknown particle type: " + line + "Supported particles are Fermion, Boson")
+    print("Selected particle is \"" + particle + "\"")
 
     T = int(input("Enter the first temperature to plot: "))
     T2 = int(input("Enter the second temperature to plot: "))
@@ -58,6 +60,7 @@ while 1 > 0:
     plt.ylim([0, 2.5])
     if particle == 'Fermion':
         plt.title('Fermi(-Dirac) distribution')
+        plt.ylim([0, .5])
     else:
         plt.title('Bose(-Einstein) distribution')
     plt.xlabel('Energy (in eV)')
@@ -65,4 +68,4 @@ while 1 > 0:
     plt.show()
 
 
-
+plot_by_temp()
