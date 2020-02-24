@@ -34,6 +34,8 @@ def populate_boson(total_energy, num_particles):
             # Throw out the state
             macrostate_index = macrostate_index - 1
         elif total_energy - i < i:
+            # The upper most energy level has been lowered, increase the lower energy levels so it stays the same
+            # TODO: include states that have more than 2 particles in an excited state
             macrostates[macrostate_index][total_energy - i] = macrostates[macrostate_index][total_energy - i] + 1
             total_occupied_energy = total_occupied_energy + (total_energy - i)
             particles_placed = particles_placed + 1
