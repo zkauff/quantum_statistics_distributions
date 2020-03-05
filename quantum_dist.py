@@ -1,6 +1,5 @@
 import sys
 import numpy as np
-import matplotlib
 from matplotlib import pyplot as plt
 
 k = 7.617 * pow(10, -5)  # eV / degree Kelvin
@@ -16,7 +15,6 @@ def bose_dist(e, t):
 
 def plot_by_temp():
     print("Plotting population dependence on temperature.")
-    matplotlib.use('TkAgg')
 
     particle = '   uninitialized'
 
@@ -32,29 +30,29 @@ def plot_by_temp():
         print("Unknown particle type: " + line + "Supported particles are Fermion, Boson")
     print("Selected particle is \"" + particle + "\"")
 
-    T = int(input("Enter the first temperature to plot: "))
-    T2 = int(input("Enter the second temperature to plot: "))
-    T3 = int(input("Enter the third temperature to plot: "))
+    t = int(input("Enter the first temperature to plot: "))
+    t2 = int(input("Enter the second temperature to plot: "))
+    t3 = int(input("Enter the third temperature to plot: "))
 
     f = np.zeros(400)
     v = np.arange(.01, 4.01, 0.01)
     for i in np.arange(0, 400):
         if particle == 'Fermion':
-            f[i] = fermi_dist(v[i], T)
+            f[i] = fermi_dist(v[i], t)
         else:
-            f[i] = bose_dist(v[i], T)
+            f[i] = bose_dist(v[i], t)
     plt.plot(v, f, color='red')
     for i in np.arange(0, 400):
         if particle == 'Fermion':
-            f[i] = fermi_dist(v[i], T2)
+            f[i] = fermi_dist(v[i], t2)
         else:
-            f[i] = bose_dist(v[i], T2)
+            f[i] = bose_dist(v[i], t2)
     plt.plot(v, f, color='blue')
     for i in np.arange(0, 400):
         if particle == 'Fermion':
-            f[i] = fermi_dist(v[i], T3)
+            f[i] = fermi_dist(v[i], t3)
         else:
-            f[i] = bose_dist(v[i], T3)
+            f[i] = bose_dist(v[i], t3)
     plt.plot(v, f, color='green')
     plt.xlim([0, 4.01])
     plt.ylim([0, 2.5])
@@ -68,4 +66,4 @@ def plot_by_temp():
     plt.show()
 
 
-plot_by_temp()
+

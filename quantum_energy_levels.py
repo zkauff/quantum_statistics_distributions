@@ -1,7 +1,15 @@
+import numpy as np
+from matplotlib import pyplot as plt
+
+
 class Macrostate:
+    # An array of num_particles where each number is one particle at the energy level represented
     particle_energies = [0]
+    # The number of particles in this macrostate
     num_particles = 0
+    # The probability of this macrostate occuring. Must be set by calling determine_macrostate_probability
     probability = 0
+    # The total energy of the system
     total_energy = 0
 
     def __init__(self, num_particles, total_energy):
@@ -73,7 +81,7 @@ def determine_macrostate_probability(macrostate_arr):
     return
 
 
-def display_macrostate(macrostate):
+def display_macrostate_text(macrostate):
     # Convert array of particles into array of energy levels
     num_per_energy_level = [0] * (macrostate.total_energy + 1)
     for i in range(0, len(num_per_energy_level)):
@@ -82,17 +90,21 @@ def display_macrostate(macrostate):
                 num_per_energy_level[i] = num_per_energy_level[i] + 1
 
     for i in range(macrostate.total_energy, -1, -1):
-        print(str(i) + "dE: ", end=" ")
+        print("% 4d dE: " % i, end=" ")
         for j in range(0, macrostate.num_particles - num_per_energy_level[i]):
             print("-", end=" ")
         for j in range(0, num_per_energy_level[i]):
-            print("x", end=" ")
+            print("\033[0;31mX\033[0;34m", end=" ")
         print(" ")
     return
 
 
-macrostates = []
-find_macrostates(9, 5, macrostates)
-for i in range(0, len(macrostates)):
-    print("Macrostate " + str(i))
-    display_macrostate(macrostates[i])
+def demo():
+    macrostates = []
+    find_macrostates(10, 5, macrostates)
+    for i in range(0, len(macrostates)):
+        print("\033[0;34mMacrostate " + str(i))
+        display_macrostate_text(macrostates[i])
+
+
+demo()
