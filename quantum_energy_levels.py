@@ -1,52 +1,59 @@
-from array import *
 
 
-def populate_boson(total_energy, num_particles):
-    # set up energy level array
-    energy_levels = array('i', [0])
-    # total number of energy levels = total_energy + 1
-    for i in range(1, total_energy + 1):
-        energy_levels.append(0)
+# arr - array to store the combination
+# index - next location in array
+# total_energy - the total number of energy levels to fill
+# reducedNum - the number of energy levels left to fill
+# num_particles - total number of energy levels to print
+def find_macrostates_rec(arr, index, total_energy,
+                         remaining_free_energy, num_particles):
+    # Base condition
+    if remaining_free_energy < 0:
+        return
 
-    # Iterate through all energy levels in descending order,
-    # filling the 'i'th energy level
-    total_occupied_energy = 0
-    particles_placed = 0
-    num_macrostates = total_energy + 1  # TODO: calculate number of macro-states
-    macrostates = [[0 for x in range(num_macrostates)] for y in range(total_energy + 1)]
-    macrostate_index = 0
-    # Algorithm: pick a highest filled energy level (go in descending order).
-    # Fill the rest accordingly
-    # Throw out the macro-state if it doesn't meet requirements
-    for i in range(total_energy, 0, -1):
-        total_occupied_energy = 0
-        macrostates[macrostate_index][i] = macrostates[macrostate_index][i] + 1
-        total_occupied_energy = total_occupied_energy + i
-        particles_placed = 1
-        if total_occupied_energy == total_energy:
-            for i in range(particles_placed, num_particles):
-                particles_placed = particles_placed + 1
-                macrostates[macrostate_index][0] = macrostates[macrostate_index][0] + 1
-            print("Macrostate " + str(macrostate_index))
-            for i in range(0, len(macrostates[macrostate_index])):
-                print(str(i) + "dE: " + str(macrostates[macrostate_index][i]))
-        elif total_occupied_energy > total_energy:
-            # Throw out the state
-            macrostate_index = macrostate_index - 1
-        elif total_energy - i < i:
-            # The upper most energy level has been lowered, increase the lower energy levels so it stays the same
-            # TODO: include states that have more than 2 particles in an excited state
-            macrostates[macrostate_index][total_energy - i] = macrostates[macrostate_index][total_energy - i] + 1
-            total_occupied_energy = total_occupied_energy + (total_energy - i)
-            particles_placed = particles_placed + 1
-            if total_occupied_energy == total_energy:
-                for i in range(particles_placed, num_particles):
-                    particles_placed = particles_placed + 1
-                    macrostates[macrostate_index][0] = macrostates[macrostate_index][0] + 1
-                print("Macrostate " + str(macrostate_index))
-                for i in range(0, len(macrostates[macrostate_index])):
-                    print(str(i) + "dE: " + str(macrostates[macrostate_index][i]))
-        macrostate_index = macrostate_index + 1
+    # If combination is
+    # found, print it
+    if remaining_free_energy == 0:
+        if index <= num_particles:
+            if index < num_particles:
+                # Print out zeroes to illustrate the particles in ground state
+                for i in range(0, num_particles - index):
+                    print(str(0), end=" ")
+            # Print out excited state particles
+            for i in range(index):
+                print(arr[i], end=" ")
+            print("")
+        return
+
+    # Find the previous number stored in arr[].
+    # It helps in maintaining increasing order
+    prev = 1 if (index == 0) else arr[index - 1]
+
+    # note loop starts from previous
+    # number i.e. at array location
+    # index - 1
+    for k in range(prev, total_energy + 1):
+        # next element of array is k
+        arr[index] = k
+
+        # call recursively with
+        # reduced number
+        find_macrostates_rec(arr, index + 1, total_energy,
+                             remaining_free_energy - k, num_particles)
 
 
-populate_boson(9, 3)
+# Function to find out all
+# combinations of positive numbers
+# that add upto given number.
+# It uses findCombinationsUtil()
+def find_macrostates(total_energy, num_particles):
+    # array to store the combinations
+    # It can contain max n elements
+    arr = [0] * total_energy
+
+    print("Finding all macrostates for " + str(num_particles) + " particles with total energy " + str(total_energy))
+    # find all combinations
+    find_macrostates_rec(arr, 0, total_energy, total_energy, num_particles)
+
+
+find_macrostates(9, 3)
