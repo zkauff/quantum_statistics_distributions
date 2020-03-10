@@ -1,5 +1,5 @@
-import numpy as np
-from matplotlib import pyplot as plt
+from scipy import misc
+from scipy.special import comb
 
 
 class Macrostate:
@@ -10,7 +10,7 @@ class Macrostate:
     # The number of particles in this macrostate
     num_particles = 0
     # The probability of this macrostate occuring. Must be set by calling determine_macrostate_probability
-    probability = 0
+    microstates = 0
     # The total energy of the system
     total_energy = 0
 
@@ -18,7 +18,7 @@ class Macrostate:
         self.particle_energies = []
         self.energy_levels = []
         self.num_particles = num_particles
-        self.probability = 0.00
+        self.microstates = 0
         self.total_energy = total_energy
 
 
@@ -94,15 +94,36 @@ def find_macrostates(total_energy, num_particles, macrostate_arr):
 # macrostate_arr - an array of macrostates, where each state must have the same total energy and number of particles
 def average_per_energy_level(macrostate_arr):
     total_energy = macrostate_arr[0].total_energy
+    num_microstates = total_microstates(macrostate_arr)
     particle_counts = []
     for i in range(0, total_energy + 1):
         particle_counts.append(0)
         for j in range(0, len(macrostate_arr)):
-            particle_counts[i] = particle_counts[i] + macrostate_arr[j].energy_levels[i]
+            particle_counts[i] = particle_counts[i] + macrostate_arr[j].energy_levels[i] * microstates_of_macrostate(macrostate_arr[j])
     # average number of particles in each state
     for i in range(len(particle_counts)):
-        print("Average number of particles at " + str(i) + " dE: " + str(particle_counts[i] / len(macrostate_arr)))
+        print("Average number of particles at " + str(i) + " dE: " + str(particle_counts[i] / num_microstates))
     return
+
+
+# Finds the number of microstates for the given macrostate
+def microstates_of_macrostate(macrostate):
+    num_microstates = 1
+    remaining_particles = macrostate.num_particles
+    for i in range(macrostate.total_energy, -1, -1):
+        num_microstates = num_microstates * (comb(remaining_particles, macrostate.energy_levels[i]))
+        remaining_particles -= macrostate.energy_levels[i]
+    macrostate.microstates = num_microstates
+    return num_microstates
+
+
+# Finds the number of microstates for a given array of macrostates by summing the number of microstates for each
+# macrostate
+def total_microstates(macrostate_arr):
+    num_microstates = 0
+    for i in range(len(macrostate_arr)):
+        num_microstates = num_microstates + microstates_of_macrostate(macrostate_arr[i])
+    return num_microstates
 
 
 def display_macrostate_text(macrostate):
@@ -118,9 +139,10 @@ def display_macrostate_text(macrostate):
 
 def demo():
     macrostates = []
-    find_macrostates(2, 5, macrostates)
+    find_macrostates(8, 9, macrostates)
     for x in range(0, len(macrostates)):
-        print("\033[0;34mMacrostate " + str(x))
+        print("\033[0;34mMacrostate " + str(x) + " (microstates: "
+              + str(microstates_of_macrostate(macrostates[x])) + ")")
         display_macrostate_text(macrostates[x])
     average_per_energy_level(macrostates)
 
