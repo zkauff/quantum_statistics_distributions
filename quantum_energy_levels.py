@@ -5,6 +5,8 @@ from matplotlib import pyplot as plt
 class Macrostate:
     # An array of num_particles where each number is one particle at the energy level represented
     particle_energies = [0]
+    # An array of size total_energy where each item is the number of particles at that energy level
+    energy_levels =[0]
     # The number of particles in this macrostate
     num_particles = 0
     # The probability of this macrostate occuring. Must be set by calling determine_macrostate_probability
@@ -14,6 +16,7 @@ class Macrostate:
 
     def __init__(self, num_particles, total_energy):
         self.particle_energies = []
+        self.energy_levels = []
         self.num_particles = num_particles
         self.probability = 0.00
         self.total_energy = total_energy
@@ -76,24 +79,38 @@ def find_macrostates(total_energy, num_particles, macrostate_arr):
     # find all combinations
     find_macrostates_rec(arr, 0, total_energy, total_energy, num_particles, macrostate_arr)
 
+    # Convert array of particles into array of energy levels
+    for k in range(0, len(macrostate_arr)):
+        macrostate = macrostate_arr[k]
+        macrostate.energy_levels = [0] * (macrostate.total_energy + 1)
+        for i in range(0, len(macrostate.energy_levels)):
+            for j in range(0, len(macrostate.particle_energies)):
+                if macrostate.particle_energies[j] == i:
+                    macrostate.energy_levels[i] = macrostate.energy_levels[i] + 1
+    return
 
-def determine_macrostate_probability(macrostate_arr):
+
+# Determines the probability of particles appearing in each state.
+# macrostate_arr - an array of macrostates, where each state must have the same total energy and number of particles
+def average_per_energy_level(macrostate_arr):
+    total_energy = macrostate_arr[0].total_energy
+    particle_counts = []
+    for i in range(0, total_energy + 1):
+        particle_counts.append(0)
+        for j in range(0, len(macrostate_arr)):
+            particle_counts[i] = particle_counts[i] + macrostate_arr[j].energy_levels[i]
+    # average number of particles in each state
+    for i in range(len(particle_counts)):
+        print("Average number of particles at " + str(i) + " dE: " + str(particle_counts[i] / len(macrostate_arr)))
     return
 
 
 def display_macrostate_text(macrostate):
-    # Convert array of particles into array of energy levels
-    num_per_energy_level = [0] * (macrostate.total_energy + 1)
-    for i in range(0, len(num_per_energy_level)):
-        for j in range(0, len(macrostate.particle_energies)):
-            if macrostate.particle_energies[j] == i:
-                num_per_energy_level[i] = num_per_energy_level[i] + 1
-
     for i in range(macrostate.total_energy, -1, -1):
         print("% 4d dE: " % i, end=" ")
-        for j in range(0, macrostate.num_particles - num_per_energy_level[i]):
+        for j in range(0, macrostate.num_particles - macrostate.energy_levels[i]):
             print("-", end=" ")
-        for j in range(0, num_per_energy_level[i]):
+        for j in range(0, macrostate.energy_levels[i]):
             print("\033[0;31mX\033[0;34m", end=" ")
         print(" ")
     return
@@ -101,10 +118,11 @@ def display_macrostate_text(macrostate):
 
 def demo():
     macrostates = []
-    find_macrostates(10, 5, macrostates)
-    for i in range(0, len(macrostates)):
-        print("\033[0;34mMacrostate " + str(i))
-        display_macrostate_text(macrostates[i])
+    find_macrostates(2, 5, macrostates)
+    for x in range(0, len(macrostates)):
+        print("\033[0;34mMacrostate " + str(x))
+        display_macrostate_text(macrostates[x])
+    average_per_energy_level(macrostates)
 
 
 demo()
