@@ -118,7 +118,8 @@ def microstates_of_macrostate(macrostate):
 
 
 # Finds the number of microstates for a given array of macrostates by summing the number of microstates for each
-# macrostate
+# macrostate. Please note that running this for a macrostate_arr with large numbers of particles and total energy will
+# be quite slow as the number of macrostates depends upon computation of factorials.
 def total_microstates(macrostate_arr):
     num_microstates = 0
     for i in range(len(macrostate_arr)):
@@ -139,7 +140,7 @@ def display_macrostate_text(macrostate):
 
 def demo():
     macrostates = []
-    find_macrostates(8, 9, macrostates)
+    find_macrostates(4, 4, macrostates)
     for x in range(0, len(macrostates)):
         print("\033[0;34mMacrostate " + str(x) + " (microstates: "
               + str(microstates_of_macrostate(macrostates[x])) + ")")
