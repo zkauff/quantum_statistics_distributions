@@ -1,4 +1,3 @@
-from scipy import misc
 from scipy.special import comb
 
 
@@ -6,7 +5,7 @@ class Macrostate:
     # An array of num_particles where each number is one particle at the energy level represented
     particle_energies = [0]
     # An array of size total_energy where each item is the number of particles at that energy level
-    energy_levels =[0]
+    energy_levels = [0]
     # The number of particles in this macrostate
     num_particles = 0
     # The probability of this macrostate occuring. Must be set by calling determine_macrostate_probability
@@ -99,7 +98,8 @@ def average_per_energy_level(macrostate_arr):
     for i in range(0, total_energy + 1):
         particle_counts.append(0)
         for j in range(0, len(macrostate_arr)):
-            particle_counts[i] = particle_counts[i] + macrostate_arr[j].energy_levels[i] * microstates_of_macrostate(macrostate_arr[j])
+            particle_counts[i] = particle_counts[i] + macrostate_arr[j].energy_levels[i] * microstates_of_macrostate(
+                macrostate_arr[j])
     # average number of particles in each state
     for i in range(len(particle_counts)):
         print("Average number of particles at " + str(i) + " dE: " + str(particle_counts[i] / num_microstates))
@@ -127,7 +127,7 @@ def total_microstates(macrostate_arr):
     return num_microstates
 
 
-def display_macrostate_text(macrostate):
+def display_macrostate_text_vertical(macrostate):
     for i in range(macrostate.total_energy, -1, -1):
         print("% 4d dE: " % i, end=" ")
         for j in range(0, macrostate.num_particles - macrostate.energy_levels[i]):
@@ -138,13 +138,39 @@ def display_macrostate_text(macrostate):
     return
 
 
-def demo():
-    macrostates = []
-    find_macrostates(4, 4, macrostates)
+def display_macrostate_arr_text(macrostates):
     for x in range(0, len(macrostates)):
         print("\033[0;34mMacrostate " + str(x) + " (microstates: "
               + str(microstates_of_macrostate(macrostates[x])) + ")")
-        display_macrostate_text(macrostates[x])
+        display_macrostate_text_vertical(macrostates[x])
+
+
+def display_macrostate_arr_text_horizontal(macrostates):
+    print("          ", end="")
+    for x in range(0, len(macrostates)):
+        print("{:<45}".format("\033[0;34mMacrostate " + str(x) + " (microstates: "
+              + str(microstates_of_macrostate(macrostates[x])) + ")"), end="")
+    print()
+    for i in range(macrostates[0].total_energy, -1, -1):
+        print("% 4d dE: " % i, end=" ")
+        for x in range(0, len(macrostates)):
+            count = 38
+            for j in range(0, macrostates[x].num_particles - macrostates[x].energy_levels[i]):
+                print("-", end=" ")
+                count = count - 2
+            for j in range(0, macrostates[x].energy_levels[i]):
+                print("\033[0;31mX\033[0;34m", end=" ")
+                count = count - 2
+            for j in range(0,  count):
+                print(" ", end="")
+        print("")
+    return
+
+
+def demo():
+    macrostates = []
+    find_macrostates(7, 7, macrostates)
+    display_macrostate_arr_text_horizontal(macrostates)
     average_per_energy_level(macrostates)
 
 
