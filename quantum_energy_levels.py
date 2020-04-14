@@ -1,4 +1,6 @@
 from scipy.special import comb
+import numpy as np
+from matplotlib import pyplot as plt
 
 
 class Macrostate:
@@ -106,12 +108,16 @@ def find_fermi_macrostates_rec(arr, index, total_energy,
     if remaining_free_energy == 0:
         if index <= num_particles:
             state = Macrostate(num_particles, total_energy)
-            occupied_levels = [0] * (num_particles + 1)
+            occupied_levels = [0] * (total_energy + 1)
             append = 1
             if index < num_particles:
                 # Print out zeroes to illustrate the particles in ground state
                 for i in range(0, num_particles - index):
                     state.particle_energies.append(0)
+                    occupied_levels[0] = occupied_levels[0] + 1
+                    if occupied_levels[0] > 2:
+                        # Pauli exclusion principle is violated
+                        append = 0
             # Print out excited state particles
             for i in range(index):
                 state.particle_energies.append(arr[i])
@@ -119,6 +125,7 @@ def find_fermi_macrostates_rec(arr, index, total_energy,
                 if occupied_levels[arr[i]] > 2:
                     # Pauli exclusion principle is violated
                     append = 0
+
             if append == 1:
                 macrostate_arr.append(state)
         return
@@ -248,11 +255,24 @@ def display_macrostate_arr_text_horizontal(macrostates):
     return
 
 
+def display_macrostate_arr_graphics(macrostates):
+    for n in range(0, len(macrostates)):
+        for i in range(macrostates[n].total_energy, -1, -1):
+            for j in range(0, macrostates[n].energy_levels[i]):
+                plt.plot(j, i, marker='o', color="red")
+        plt.xlim([-1, macrostates[n].num_particles])
+        plt.ylim([-1, macrostates[n].total_energy + 1])
+        plt.title('Macrostate ' + str(n) + ' (' + str(macrostates[n].microstates) + ' microstates)')
+        plt.gca().axes.get_xaxis().set_visible(False)
+        plt.show()
+    return
+
+
 def demo():
     macrostates = []
-    find_fermi_macrostates(7, 7, macrostates)
+    find_fermi_macrostates(9, 5, macrostates)
     display_macrostate_arr_text_horizontal(macrostates)
     average_per_energy_level(macrostates)
-
+    display_macrostate_arr_graphics(macrostates)
 
 demo()
