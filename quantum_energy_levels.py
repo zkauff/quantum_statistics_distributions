@@ -27,8 +27,8 @@ class Macrostate:
 # reducedNum - the number of energy levels left to fill
 # num_particles - total number of energy levels to print
 # macrostate_arr - array of Macrostates to update
-def find_macrostates_rec(arr, index, total_energy,
-                         remaining_free_energy, num_particles, macrostate_arr):
+def find_boson_macrostates_rec(arr, index, total_energy,
+                               remaining_free_energy, num_particles, macrostate_arr):
     # Base condition
     if remaining_free_energy < 0:
         return
@@ -61,22 +61,97 @@ def find_macrostates_rec(arr, index, total_energy,
 
         # call recursively with
         # reduced number
-        find_macrostates_rec(arr, index + 1, total_energy,
-                             remaining_free_energy - k, num_particles, macrostate_arr)
+        find_boson_macrostates_rec(arr, index + 1, total_energy,
+                                   remaining_free_energy - k, num_particles, macrostate_arr)
 
 
 # Function to find out all
 # combinations of positive numbers
 # that add upto given number.
 # It uses findCombinationsUtil()
-def find_macrostates(total_energy, num_particles, macrostate_arr):
+def find_boson_macrostates(total_energy, num_particles, macrostate_arr):
     # array to store the combinations
     # It can contain max n elements
     arr = [0] * total_energy
 
     print("Finding all macrostates for " + str(num_particles) + " particles with total energy " + str(total_energy))
     # find all combinations
-    find_macrostates_rec(arr, 0, total_energy, total_energy, num_particles, macrostate_arr)
+    find_boson_macrostates_rec(arr, 0, total_energy, total_energy, num_particles, macrostate_arr)
+
+    # Convert array of particles into array of energy levels
+    for k in range(0, len(macrostate_arr)):
+        macrostate = macrostate_arr[k]
+        macrostate.energy_levels = [0] * (macrostate.total_energy + 1)
+        for i in range(0, len(macrostate.energy_levels)):
+            for j in range(0, len(macrostate.particle_energies)):
+                if macrostate.particle_energies[j] == i:
+                    macrostate.energy_levels[i] = macrostate.energy_levels[i] + 1
+    return
+
+
+# arr - array to store the combination
+# index - next location in array
+# total_energy - the total number of energy levels to fill
+# reducedNum - the number of energy levels left to fill
+# num_particles - total number of energy levels to print
+# macrostate_arr - array of Macrostates to update
+def find_fermi_macrostates_rec(arr, index, total_energy,
+                               remaining_free_energy, num_particles, macrostate_arr):
+    # Base condition
+    if remaining_free_energy < 0:
+        return
+
+    # If combination is
+    # found, append it
+    if remaining_free_energy == 0:
+        if index <= num_particles:
+            state = Macrostate(num_particles, total_energy)
+            occupied_levels = [0] * (num_particles + 1)
+            append = 1
+            if index < num_particles:
+                # Print out zeroes to illustrate the particles in ground state
+                for i in range(0, num_particles - index):
+                    state.particle_energies.append(0)
+            # Print out excited state particles
+            for i in range(index):
+                state.particle_energies.append(arr[i])
+                occupied_levels[arr[i]] = occupied_levels[arr[i]] + 1
+                if occupied_levels[arr[i]] > 2:
+                    # Pauli exclusion principle is violated
+                    append = 0
+            if append == 1:
+                macrostate_arr.append(state)
+        return
+
+    # Find the previous number stored in arr[].
+    # It helps in maintaining increasing order
+    prev = 1 if (index == 0) else arr[index - 1]
+
+    # note loop starts from previous
+    # number i.e. at array location
+    # index - 1
+    for k in range(prev, total_energy + 1):
+        # next element of array is k
+        arr[index] = k
+
+        # call recursively with
+        # reduced number
+        find_fermi_macrostates_rec(arr, index + 1, total_energy,
+                                   remaining_free_energy - k, num_particles, macrostate_arr)
+
+
+# Function to find out all
+# combinations of positive numbers
+# that add upto given number.
+# It uses findCombinationsUtil()
+def find_fermi_macrostates(total_energy, num_particles, macrostate_arr):
+    # array to store the combinations
+    # It can contain max n elements
+    arr = [0] * total_energy
+
+    print("Finding all macrostates for " + str(num_particles) + " particles with total energy " + str(total_energy))
+    # find all combinations
+    find_fermi_macrostates_rec(arr, 0, total_energy, total_energy, num_particles, macrostate_arr)
 
     # Convert array of particles into array of energy levels
     for k in range(0, len(macrostate_arr)):
@@ -138,7 +213,7 @@ def display_macrostate_text_vertical(macrostate):
     return
 
 
-def display_macrostate_arr_text(macrostates):
+def display_macrostate_arr_text_vertical(macrostates):
     for x in range(0, len(macrostates)):
         print("\033[0;34mMacrostate " + str(x) + " (microstates: "
               + str(microstates_of_macrostate(macrostates[x])) + ")")
@@ -146,30 +221,36 @@ def display_macrostate_arr_text(macrostates):
 
 
 def display_macrostate_arr_text_horizontal(macrostates):
-    print("          ", end="")
+    print("          ", end="")  # offsets the fact that lower rows have '0dE: ' before each level
+    # print each title
     for x in range(0, len(macrostates)):
         print("{:<45}".format("\033[0;34mMacrostate " + str(x) + " (microstates: "
               + str(microstates_of_macrostate(macrostates[x])) + ")"), end="")
     print()
     for i in range(macrostates[0].total_energy, -1, -1):
+        # print energy level descriptor
         print("% 4d dE: " % i, end=" ")
         for x in range(0, len(macrostates)):
             count = 38
+            # print dashes for each empty slot
             for j in range(0, macrostates[x].num_particles - macrostates[x].energy_levels[i]):
                 print("-", end=" ")
                 count = count - 2
+            # print X's for each occupied slot
             for j in range(0, macrostates[x].energy_levels[i]):
                 print("\033[0;31mX\033[0;34m", end=" ")
                 count = count - 2
+            # pad the rest of the space with spaces to line up with macrostate titles
             for j in range(0,  count):
                 print(" ", end="")
+        # print newline
         print("")
     return
 
 
 def demo():
     macrostates = []
-    find_macrostates(7, 7, macrostates)
+    find_fermi_macrostates(7, 7, macrostates)
     display_macrostate_arr_text_horizontal(macrostates)
     average_per_energy_level(macrostates)
 
