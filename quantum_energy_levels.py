@@ -1,6 +1,7 @@
 from scipy.special import comb
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.ticker import (AutoMinorLocator, MultipleLocator)
 
 
 class Macrostate:
@@ -256,14 +257,18 @@ def display_macrostate_arr_text_horizontal(macrostates):
 
 
 def display_macrostate_arr_graphics(macrostates):
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
     for n in range(0, len(macrostates)):
         for i in range(macrostates[n].total_energy, -1, -1):
             for j in range(0, macrostates[n].energy_levels[i]):
                 plt.plot(j, i, marker='o', color="red")
         plt.xlim([-1, macrostates[n].num_particles])
-        plt.ylim([-1, macrostates[n].total_energy + 1])
+        plt.ylim([-1, macrostates[n].total_energy])
         plt.title('Macrostate ' + str(n) + ' (' + str(macrostates[n].microstates) + ' microstates)')
-        plt.gca().axes.get_xaxis().set_visible(False)
+        ax.axes.get_xaxis().set_visible(False)
+        ax.yaxis.set_major_locator(MultipleLocator(1))
+        ax.grid(which='major', axis='y', color='#CCCCCC', linestyle='--')
         plt.show()
     return
 
