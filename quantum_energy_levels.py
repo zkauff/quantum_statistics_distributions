@@ -270,7 +270,7 @@ def display_macrostate_arr_graphics(macrostates):
                 if macrostates[n].particle_type == "fermion":
                     axs[n % 3][int(n / 3)].plot(j, i, marker='o', color="red")
                 else:
-                    axs[n % 3][int(n / 3)].plot(j, i, maker='x', color="blue")
+                    axs[n % 3][int(n / 3)].plot(j, i, marker='o', color="blue")
                 axs[n % 3][int(n / 3)].set_xlim([-1, macrostates[n].num_particles])
                 axs[n % 3][int(n / 3)].set_ylim([-1, macrostates[n].total_energy])
                 axs[n % 3][int(n / 3)].set_title(
@@ -284,7 +284,7 @@ def display_macrostate_arr_graphics(macrostates):
 
 def demo():
     macrostates = []
-    find_fermi_macrostates(6, 4, macrostates)
+    find_boson_macrostates(6, 4, macrostates)
     average_per_energy_level(macrostates)
     display_macrostate_arr_graphics(macrostates)
 
