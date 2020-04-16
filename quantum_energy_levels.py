@@ -16,13 +16,16 @@ class Macrostate:
     microstates = 0
     # The total energy of the system
     total_energy = 0
+    # Fermion or boson
+    particle_type = 'undefined'
 
-    def __init__(self, num_particles, total_energy):
+    def __init__(self, num_particles, total_energy, particle_type):
         self.particle_energies = []
         self.energy_levels = []
         self.num_particles = num_particles
         self.microstates = 0
         self.total_energy = total_energy
+        self.particle_type = particle_type
 
 
 # arr - array to store the combination
@@ -41,7 +44,7 @@ def find_boson_macrostates_rec(arr, index, total_energy,
     # found, print it
     if remaining_free_energy == 0:
         if index <= num_particles:
-            state = Macrostate(num_particles, total_energy)
+            state = Macrostate(num_particles, total_energy, 'boson')
             if index < num_particles:
                 # Print out zeroes to illustrate the particles in ground state
                 for i in range(0, num_particles - index):
@@ -109,7 +112,7 @@ def find_fermi_macrostates_rec(arr, index, total_energy,
     # found, append it
     if remaining_free_energy == 0:
         if index <= num_particles:
-            state = Macrostate(num_particles, total_energy)
+            state = Macrostate(num_particles, total_energy, 'fermion')
             occupied_levels = [0] * (total_energy + 1)
             append = 1
             if index < num_particles:
@@ -259,16 +262,22 @@ def display_macrostate_arr_text_horizontal(macrostates):
 
 def display_macrostate_arr_graphics(macrostates):
     fig, axs = plt.subplots(3, int(len(macrostates) / 3))
+    fig.suptitle("Macrostates for a system with " + str(macrostates[0].total_energy) + " energy and "
+                 + str(macrostates[0].num_particles) + " " + str(macrostates[0].particle_type) + "s", fontsize=16)
     for n in range(0, len(macrostates)):
         for i in range(macrostates[n].total_energy, -1, -1):
             for j in range(0, macrostates[n].energy_levels[i]):
-                axs[n%3][int(n/3)].plot(j, i, marker='o', color="red")
-                axs[n%3][int(n/3)].set_xlim([-1, macrostates[n].num_particles])
-                axs[n%3][int(n/3)].set_ylim([-1, macrostates[n].total_energy])
-                axs[n%3][int(n/3)].set_title('Macrostate ' + str(n) + ' (' + str(macrostates[n].microstates) + ' microstates)')
-                axs[n%3][int(n/3)].axes.get_xaxis().set_visible(False)
-                axs[n%3][int(n/3)].yaxis.set_major_locator(MultipleLocator(1))
-                axs[n%3][int(n/3)].grid(which='major', axis='y', color='#CCCCCC', linestyle='--')
+                if macrostates[n].particle_type == "fermion":
+                    axs[n % 3][int(n / 3)].plot(j, i, marker='o', color="red")
+                else:
+                    axs[n % 3][int(n / 3)].plot(j, i, maker='x', color="blue")
+                axs[n % 3][int(n / 3)].set_xlim([-1, macrostates[n].num_particles])
+                axs[n % 3][int(n / 3)].set_ylim([-1, macrostates[n].total_energy])
+                axs[n % 3][int(n / 3)].set_title(
+                    'Macrostate ' + str(n) + ' (' + str(macrostates[n].microstates) + ' microstates)')
+                axs[n % 3][int(n / 3)].axes.get_xaxis().set_visible(False)
+                axs[n % 3][int(n / 3)].yaxis.set_major_locator(MultipleLocator(1))
+                axs[n % 3][int(n / 3)].grid(which='major', axis='y', color='#CCCCCC', linestyle='--')
     plt.show()
     return
 
@@ -276,7 +285,6 @@ def display_macrostate_arr_graphics(macrostates):
 def demo():
     macrostates = []
     find_fermi_macrostates(6, 4, macrostates)
-    display_macrostate_arr_text_horizontal(macrostates)
     average_per_energy_level(macrostates)
     display_macrostate_arr_graphics(macrostates)
 
