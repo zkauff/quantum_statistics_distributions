@@ -2,6 +2,7 @@ from scipy.special import comb
 import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.ticker import (AutoMinorLocator, MultipleLocator)
+import matplotlib.gridspec as gridspec
 
 
 class Macrostate:
@@ -233,7 +234,7 @@ def display_macrostate_arr_text_horizontal(macrostates):
     # print each title
     for x in range(0, len(macrostates)):
         print("{:<45}".format("\033[0;34mMacrostate " + str(x) + " (microstates: "
-              + str(microstates_of_macrostate(macrostates[x])) + ")"), end="")
+                              + str(microstates_of_macrostate(macrostates[x])) + ")"), end="")
     print()
     for i in range(macrostates[0].total_energy, -1, -1):
         # print energy level descriptor
@@ -249,7 +250,7 @@ def display_macrostate_arr_text_horizontal(macrostates):
                 print("\033[0;31mX\033[0;34m", end=" ")
                 count = count - 2
             # pad the rest of the space with spaces to line up with macrostate titles
-            for j in range(0,  count):
+            for j in range(0, count):
                 print(" ", end="")
         # print newline
         print("")
@@ -257,27 +258,27 @@ def display_macrostate_arr_text_horizontal(macrostates):
 
 
 def display_macrostate_arr_graphics(macrostates):
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
+    fig, axs = plt.subplots(3, int(len(macrostates) / 3))
     for n in range(0, len(macrostates)):
         for i in range(macrostates[n].total_energy, -1, -1):
             for j in range(0, macrostates[n].energy_levels[i]):
-                plt.plot(j, i, marker='o', color="red")
-        plt.xlim([-1, macrostates[n].num_particles])
-        plt.ylim([-1, macrostates[n].total_energy])
-        plt.title('Macrostate ' + str(n) + ' (' + str(macrostates[n].microstates) + ' microstates)')
-        ax.axes.get_xaxis().set_visible(False)
-        ax.yaxis.set_major_locator(MultipleLocator(1))
-        ax.grid(which='major', axis='y', color='#CCCCCC', linestyle='--')
-        plt.show()
+                axs[n%3][int(n/3)].plot(j, i, marker='o', color="red")
+                axs[n%3][int(n/3)].set_xlim([-1, macrostates[n].num_particles])
+                axs[n%3][int(n/3)].set_ylim([-1, macrostates[n].total_energy])
+                axs[n%3][int(n/3)].set_title('Macrostate ' + str(n) + ' (' + str(macrostates[n].microstates) + ' microstates)')
+                axs[n%3][int(n/3)].axes.get_xaxis().set_visible(False)
+                axs[n%3][int(n/3)].yaxis.set_major_locator(MultipleLocator(1))
+                axs[n%3][int(n/3)].grid(which='major', axis='y', color='#CCCCCC', linestyle='--')
+    plt.show()
     return
 
 
 def demo():
     macrostates = []
-    find_fermi_macrostates(9, 5, macrostates)
+    find_fermi_macrostates(6, 4, macrostates)
     display_macrostate_arr_text_horizontal(macrostates)
     average_per_energy_level(macrostates)
     display_macrostate_arr_graphics(macrostates)
+
 
 demo()
