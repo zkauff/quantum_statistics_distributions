@@ -262,13 +262,13 @@ def display_macrostate_arr_text_horizontal(macrostates):
 
 def display_macrostate_arr_graphics(macrostates):
     if len(macrostates) > 3:
-        fig, axs = plt.subplots(3, int(len(macrostates) / 3))
+        fig, axs = plt.subplots(3, int(len(macrostates) / 3) + 1)
     else:
         fig, axs = plt.subplots(3)
     fig.suptitle("Macrostates for a system with " + str(macrostates[0].total_energy) + " energy and "
                  + str(macrostates[0].num_particles) + " " + str(macrostates[0].particle_type) + "s", fontsize=16)
     for n in range(0, len(macrostates)):
-        if int(len(macrostates) / 3) > 0:
+        if len(macrostates) >= 3:
             for i in range(macrostates[n].total_energy, -1, -1):
                 for j in range(0, macrostates[n].energy_levels[i]):
                     if macrostates[n].particle_type == "fermion":
