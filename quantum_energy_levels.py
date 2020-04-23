@@ -282,11 +282,17 @@ def display_macrostate_arr_graphics(macrostates):
     return
 
 
-def demo():
-    macrostates = []
-    find_boson_macrostates(6, 4, macrostates)
-    average_per_energy_level(macrostates)
-    display_macrostate_arr_graphics(macrostates)
+def prompt_loop():
+    while(True):
+        particle = input("Plot energy levels for fermion or boson?")
+        macrostates = []
+        if particle == "fermion":
+            find_fermi_macrostates(int(input("Total energy: ")), int(input("Number of particles: ")), macrostates)
+        if particle == "boson":
+            find_boson_macrostates(int(input("Total energy: ")), int(input("Number of particles: ")), macrostates)
+        average_per_energy_level(macrostates)
+        display_macrostate_arr_text_horizontal(macrostates)
+        display_macrostate_arr_graphics(macrostates)
 
 
-demo()
+prompt_loop()
