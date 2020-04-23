@@ -261,26 +261,43 @@ def display_macrostate_arr_text_horizontal(macrostates):
 
 
 def display_macrostate_arr_graphics(macrostates):
-    fig, axs = plt.subplots(3, int(len(macrostates) / 3))
+    if len(macrostates) > 3:
+        fig, axs = plt.subplots(3, int(len(macrostates) / 3))
+    else:
+        fig, axs = plt.subplots(3)
     fig.suptitle("Macrostates for a system with " + str(macrostates[0].total_energy) + " energy and "
                  + str(macrostates[0].num_particles) + " " + str(macrostates[0].particle_type) + "s", fontsize=16)
     for n in range(0, len(macrostates)):
-        for i in range(macrostates[n].total_energy, -1, -1):
-            for j in range(0, macrostates[n].energy_levels[i]):
-                if macrostates[n].particle_type == "fermion":
-                    axs[n % 3][int(n / 3)].plot(j, i, marker='o', color="red")
-                else:
-                    axs[n % 3][int(n / 3)].plot(j, i, marker='o', color="blue")
-                axs[n % 3][int(n / 3)].set_xlim([-1, macrostates[n].num_particles])
-                axs[n % 3][int(n / 3)].set_ylim([-1, macrostates[n].total_energy])
-                axs[n % 3][int(n / 3)].set_title(
-                    'Macrostate ' + str(n) + ' (' + str(macrostates[n].microstates) + ' microstates)')
-                axs[n % 3][int(n / 3)].axes.get_xaxis().set_visible(False)
-                axs[n % 3][int(n / 3)].yaxis.set_major_locator(MultipleLocator(1))
-                axs[n % 3][int(n / 3)].grid(which='major', axis='y', color='#CCCCCC', linestyle='--')
+        if int(len(macrostates) / 3) > 0:
+            for i in range(macrostates[n].total_energy, -1, -1):
+                for j in range(0, macrostates[n].energy_levels[i]):
+                    if macrostates[n].particle_type == "fermion":
+                        axs[n % 3][int(n / 3)].plot(j, i, marker='o', color="red")
+                    else:
+                        axs[n % 3][int(n / 3)].plot(j, i, marker='o', color="blue")
+                    axs[n % 3][int(n / 3)].set_xlim([-1, macrostates[n].num_particles])
+                    axs[n % 3][int(n / 3)].set_ylim([-1, macrostates[n].total_energy])
+                    axs[n % 3][int(n / 3)].set_title(
+                        'Macrostate ' + str(n) + ' (' + str(macrostates[n].microstates) + ' microstates)')
+                    axs[n % 3][int(n / 3)].axes.get_xaxis().set_visible(False)
+                    axs[n % 3][int(n / 3)].yaxis.set_major_locator(MultipleLocator(1))
+                    axs[n % 3][int(n / 3)].grid(which='major', axis='y', color='#CCCCCC', linestyle='--')
+        else:
+            for i in range(macrostates[n].total_energy, -1, -1):
+                for j in range(0, macrostates[n].energy_levels[i]):
+                    if macrostates[n].particle_type == "fermion":
+                        axs[n].plot(j, i, marker='o', color="red")
+                    else:
+                        axs[n].plot(j, i, marker='o', color="blue")
+                    axs[n].set_xlim([-1, macrostates[n].num_particles])
+                    axs[n].set_ylim([-1, macrostates[n].total_energy])
+                    axs[n].set_title(
+                        'Macrostate ' + str(n) + ' (' + str(macrostates[n].microstates) + ' microstates)')
+                    axs[n].axes.get_xaxis().set_visible(False)
+                    axs[n].yaxis.set_major_locator(MultipleLocator(1))
+                    axs[n].grid(which='major', axis='y', color='#CCCCCC', linestyle='--')
     plt.show()
     return
-
 
 def prompt_loop():
     while(True):
@@ -288,11 +305,14 @@ def prompt_loop():
         macrostates = []
         if particle == "fermion":
             find_fermi_macrostates(int(input("Total energy: ")), int(input("Number of particles: ")), macrostates)
-        if particle == "boson":
+        else:
             find_boson_macrostates(int(input("Total energy: ")), int(input("Number of particles: ")), macrostates)
-        average_per_energy_level(macrostates)
-        display_macrostate_arr_text_horizontal(macrostates)
-        display_macrostate_arr_graphics(macrostates)
+        if len(macrostates) == 0:
+            print("No macrostates found.")
+        else:
+            average_per_energy_level(macrostates)
+            display_macrostate_arr_text_horizontal(macrostates)
+            display_macrostate_arr_graphics(macrostates)
 
 
 prompt_loop()
