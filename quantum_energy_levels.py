@@ -268,7 +268,7 @@ def display_macrostate_arr_graphics(macrostates):
     fig.suptitle("Macrostates for a system with " + str(macrostates[0].total_energy) + " energy and "
                  + str(macrostates[0].num_particles) + " " + str(macrostates[0].particle_type) + "s", fontsize=16)
     for n in range(0, len(macrostates)):
-        if len(macrostates) >= 3:
+        if len(macrostates) > 3:
             for i in range(macrostates[n].total_energy, -1, -1):
                 for j in range(0, macrostates[n].energy_levels[i]):
                     if macrostates[n].particle_type == "fermion":
@@ -299,9 +299,10 @@ def display_macrostate_arr_graphics(macrostates):
     plt.show()
     return
 
+
 def prompt_loop():
     while(True):
-        particle = input("Plot energy levels for fermion or boson?")
+        particle = input("\033[0;34mPlot energy levels for fermion or boson?")
         macrostates = []
         if particle == "fermion":
             find_fermi_macrostates(int(input("Total energy: ")), int(input("Number of particles: ")), macrostates)
